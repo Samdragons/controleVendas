@@ -1,11 +1,16 @@
+
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+
 package view;
 
-
+import controller.ClienteDAO;
+import controller.ProdutoDAO;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
@@ -18,15 +23,20 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import model.Cliente;
+import model.Produto;
 
 /**
  *
  * @author Cleber Feitosa
  */
 public class FrmVendas extends javax.swing.JFrame {
-
     
+    Cliente obj = new Cliente();
+    double preco, subtotal, total;
+    int qtd;
     
+    DefaultTableModel carrinho;
 
     public FrmVendas() {
         initComponents();
@@ -438,7 +448,11 @@ public class FrmVendas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-
+        // Carregar data atual do sistema (sysdate)
+        Date agora = new Date();
+        SimpleDateFormat dataBr = new SimpleDateFormat("dd/MM/yyyy");
+        String dataFormatada = dataBr.format(agora);
+        txtdataatual.setText(dataFormatada);
         
 
 
@@ -480,16 +494,41 @@ public class FrmVendas extends javax.swing.JFrame {
     }//GEN-LAST:event_txtqtdActionPerformed
 
     private void btnaddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnaddActionPerformed
+    
+        qtd = Integer.parseInt(txtqtd.getText());
+        preco = Double.parseDouble(txtpreco.getText());
+        subtotal = qtd * preco;
+        total += subtotal;
+        txttotal.setText(String.valueOf(total));
         
-      
+        carrinho = (DefaultTableModel) tabelaItens.getModel();
+        
+        carrinho.addRow(new Object[]{
+            txtcodigo.getText(),
+            txtdescricao.getText(),
+            txtqtd.getText(),
+            txtpreco.getText(),
+        });
+        
     }//GEN-LAST:event_btnaddActionPerformed
 
     private void btnbuscaclienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnbuscaclienteActionPerformed
-
+        ClienteDAO dao = new ClienteDAO();
+        obj = dao.buscaporcpf(txtcpf.getText());
+        txtnome.setText(obj.getNome());
+        
+        
     }//GEN-LAST:event_btnbuscaclienteActionPerformed
 
     private void txtbuscaprodutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtbuscaprodutoActionPerformed
-       
+                                              
+        Produto obj = new Produto();
+        ProdutoDAO dao = new ProdutoDAO();
+
+        obj = dao.buscaPorCodigo(Integer.parseInt(txtcodigo.getText()));
+
+        txtdescricao.setText(obj.getDescricao());
+        txtpreco.setText(String.valueOf(obj.getPreco()));
     }//GEN-LAST:event_txtbuscaprodutoActionPerformed
 
     private void txttotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txttotalActionPerformed
@@ -497,13 +536,27 @@ public class FrmVendas extends javax.swing.JFrame {
     }//GEN-LAST:event_txttotalActionPerformed
 
     private void txtcpfKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcpfKeyPressed
-        
+        // Buscar cliente por CPF
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            ClienteDAO dao = new ClienteDAO();
+            obj = dao.buscaporcpf(txtcpf.getText());
+            txtnome.setText(obj.getNome());
+        }
 
     }//GEN-LAST:event_txtcpfKeyPressed
 
     private void txtcodigoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigoKeyPressed
-        
-        
+
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            Produto obj = new Produto();
+            ProdutoDAO dao = new ProdutoDAO();
+
+            obj = dao.buscaPorCodigo(Integer.parseInt(txtcodigo.getText()));
+
+            txtdescricao.setText(obj.getDescricao());
+            txtpreco.setText(String.valueOf(obj.getPreco()));
+
+        }
     }//GEN-LAST:event_txtcodigoKeyPressed
 
     /**
